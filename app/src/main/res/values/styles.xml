@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="RoundedImageView">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50dp</item> <!-- Adjust the corner radius -->
+    </style>
+
+        <style name="TransparentDialog" parent="Theme.AppCompat.Light.Dialog">
+            <item name="android:windowBackground">@android:color/transparent</item>
+        </style>
+
+    <style name="CustomPopupMenu" parent="Widget.AppCompat.PopupMenu.Overflow">
+        <item name="android:popupBackground">@drawable/custom_menu_background</item>
+    </style>
+</resources>
