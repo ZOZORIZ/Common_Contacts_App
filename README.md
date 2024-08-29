@@ -1,9 +1,9 @@
-Contacts App
+#Contacts App
 
 
 
 
-This is an Android Contacts App with integrated camera functionality, built using Room and Firestore databases. 
+This is an Android Contacts App with integrated camera functionality, built using Room and Firestore databases.
 The app allows users to manage their contacts, sync them across devices, and view contacts shared by other users.
 
 
