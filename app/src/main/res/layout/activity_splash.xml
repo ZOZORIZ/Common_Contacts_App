@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <ImageView
+        android:id="@+id/splash_logo"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:layout_centerInParent="true"
+        android:src="@drawable/app_icon"/>
+     <TextView
+         android:id="@+id/splash_text1"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:text="Contacts"
+         android:layout_below="@id/splash_logo"
+         android:layout_centerHorizontal="true"
+         android:layout_marginTop="16dp"
+         android:textColor="@color/black"
+         android:textStyle="bold"
+         android:textSize="30sp"
+         android:visibility="invisible"/>
+
+      <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+          android:layout_below="@id/splash_text1"
+          android:translationY="30dp"
+          android:visibility="invisible"
+          android:indeterminateTint="@android:color/black"/>
+
+        <TextView
+            android:id="@+id/splash_credit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="By Noah,Rayid,Ebin,Aswin,Nidhin"
+            android:layout_alignParentBottom="true"
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:textStyle="italic"
+            android:translationY="-100dp"
+            android:visibility="invisible"
+            />
+</RelativeLayout>

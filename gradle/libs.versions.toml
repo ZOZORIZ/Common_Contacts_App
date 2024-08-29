@@ -1,0 +1,124 @@
+[versions]
+activityComposeVersion = "1.9.0"
+agp = "8.5.1"
+androidxJunit = "1.1.5"
+appcompat = "1.7.0"
+cameraLifecycleVersion = "1.4.0-rc01"
+cameraViewVersion = "1.0.0-alpha31"
+comGoogleDevtoolsKspGradlePlugin = "1.9.0-1.0.13"
+compiler = "4.15.1"
+compilerVersion = "4.14.2'"
+compressor = "3.0.1"
+constraintlayout = "2.1.4"
+coreKtxVersion = "1.12.0"
+coreSplashscreen = "1.0.1"
+espressoCoreVersion = "3.5.1"
+firebaseBom = "33.1.2"
+firebaseFirestoreKtxVersion = "24.7.0"
+firebaseStorageKtxVersion = "20.2.0"
+glide = "4.14.2"
+guava = "32.0.1-jre"
+imgCompressor = "1.0.0"
+kotlin = "1.9.0"
+coreKtx = "1.13.1"
+junit = "4.13.2"
+junitVersion = "1.2.1"
+espressoCore = "3.6.1"
+kotlinStdlib = "1.9.22"
+kotlinxCoroutinesAndroid = "1.6.0"
+kotlinxCoroutinesAndroidVersion = "1.7.3"
+libphonenumber = "8.13.15"
+lifecycleRuntimeKtx = "2.8.4"
+activityCompose = "1.9.1"
+composeBom = "2024.04.01"
+cameraLifecycle = "1.3.4"
+cameraView = "1.3.4"
+firebaseInappmessagingKtx = "21.0.0"
+lifecycleRuntimeKtxVersion = "2.6.2"
+material = "1.12.0"
+material3 = "1.2.1"
+picasso = "2.71828"
+recyclerview = "1.3.2"
+room = "2.5.0"
+roomCompiler = "2.5.0"
+roomKtx = "2.6.1"
+roomRuntime = "2.5.0"
+ucrop = "2.2.8"
+ui = "1.6.8"
+uiTestJunit4 = "1.6.8"
+uiTooling = "1.6.8"
+uiToolingPreview = "1.6.8"
+media3Common = "1.4.0"
+firebaseFirestoreKtx = "25.0.0"
+firebaseStorageKtx = "21.0.0"
+
+[libraries]
+androidx-activity-compose-v190 = { module = "androidx.activity:activity-compose", version.ref = "activityComposeVersion" }
+androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
+androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraLifecycleVersion" }
+androidx-camera-core = { module = "androidx.camera:camera-core", version.ref = "cameraLifecycleVersion" }
+androidx-camera-lifecycle-v140rc01 = { module = "androidx.camera:camera-lifecycle", version.ref = "cameraLifecycleVersion" }
+androidx-camera-view-v100alpha31 = { module = "androidx.camera:camera-view", version.ref = "cameraViewVersion" }
+androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-core-ktx-v1120 = { module = "androidx.core:core-ktx", version.ref = "coreKtxVersion" }
+androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
+androidx-espresso-core-v351 = { module = "androidx.test.espresso:espresso-core", version.ref = "espressoCoreVersion" }
+androidx-junit-v115 = { module = "androidx.test.ext:junit", version.ref = "androidxJunit" }
+androidx-lifecycle-runtime-ktx-v262 = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtxVersion" }
+androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerview" }
+compiler-v4142 = { module = "com.github.bumptech.glide:compiler", version.ref = "compilerVersion" }
+compressor = { module = "id.zelory:compressor", version.ref = "compressor" }
+firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-database-ktx = { module = "com.google.firebase:firebase-database-ktx" }
+firebase-firestore-ktx-v2470 = { module = "com.google.firebase:firebase-firestore-ktx", version.ref = "firebaseFirestoreKtxVersion" }
+firebase-storage-ktx-v2020 = { module = "com.google.firebase:firebase-storage-ktx", version.ref = "firebaseStorageKtxVersion" }
+glide-v4142 = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
+img-compressor = { module = "com.github.f0ris:img-compressor", version.ref = "imgCompressor" }
+libphonenumber = { module = "com.googlecode.libphonenumber:libphonenumber", version.ref = "libphonenumber" }
+picasso = { module = "com.squareup.picasso:picasso", version.ref = "picasso" }
+room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+com-google-devtools-ksp-gradle-plugin = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "comGoogleDevtoolsKspGradlePlugin" }
+compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "compiler" }
+glide = { module = "com.github.bumptech.glide:glide", version.ref = "compiler" }
+guava = { module = "com.google.guava:guava", version.ref = "guava" }
+jetbrains-kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroidVersion" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidx-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "cameraLifecycle" }
+androidx-camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "cameraView" }
+firebase-inappmessaging-ktx = { group = "com.google.firebase", name = "firebase-inappmessaging-ktx", version.ref = "firebaseInappmessagingKtx" }
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlinStdlib" }
+kotlinx-coroutines-android-v160 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
+material = { module = "com.google.android.material:material", version.ref = "material" }
+material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
+org-jetbrains-kotlinx-kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesAndroidVersion" }
+ucrop = { module = "com.github.yalantis:ucrop", version.ref = "ucrop" }
+ui = { module = "androidx.compose.ui:ui", version.ref = "ui" }
+ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "uiTestJunit4" }
+ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "uiTooling" }
+ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "uiToolingPreview" }
+androidx-media3-common = { group = "androidx.media3", name = "media3-common", version.ref = "media3Common" }
+firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
+firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseStorageKtx" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+google-ksp = { id = "com.google.devtools.ksp", version = "1.9.0-1.0.13" }
+
+

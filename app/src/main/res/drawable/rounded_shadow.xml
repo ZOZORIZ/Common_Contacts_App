@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/drawable/rounded_shadow.xml -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/transparent" />
+            <corners android:radius="16dp" />
+            <padding android:left="2dp" android:right="2dp"
+                android:top="2dp" android:bottom="2dp"/>
+            <size android:width="200dp" android:height="200dp" />
+        </shape>
+    </item>
+    <item android:left="3dp" android:right="3dp"
+        android:top="3dp" android:bottom="3dp">
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/black" />
+            <corners android:radius="16dp" />
+            <size android:width="200dp" android:height="200dp" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/white" />
+            <corners android:radius="16dp" />
+            <size android:width="200dp" android:height="200dp" />
+        </shape>
+    </item>
+</layer-list>

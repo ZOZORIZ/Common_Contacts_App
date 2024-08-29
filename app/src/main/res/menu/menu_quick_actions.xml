@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_call"
+        android:title="Call Contact" />
+    <item
+        android:id="@+id/action_edit"
+        android:title="Edit Contact" />
+    <item
+        android:id="@+id/action_view"
+        android:title="View Contact" />
+    <!-- Add more actions as needed -->
+    <item
+        android:id="@+id/action_delete"
+        android:title="Delete Contact" />
+</menu>
