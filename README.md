@@ -1,8 +1,5 @@
 #Contacts App
 
-
-
-
 This is an Android Contacts App with integrated camera functionality, built using Room and Firestore databases.
 The app allows users to manage their contacts, sync them across devices, and view contacts shared by other users.
 
@@ -29,8 +26,6 @@ The app allows users to manage their contacts, sync them across devices, and vie
 
 
 ###Installation:
-1) Clone the repository to your local machine: git clone https://github.com/ZOZORIZ/Common_Contacts_App
-
 2) Open the project in Android Studio.
 3) Build and run the app on an emulator or a physical device.
 
@@ -47,9 +42,6 @@ The app allows users to manage their contacts, sync them across devices, and vie
 Contributions are welcome! Please follow these steps to contribute:
 
 1) Fork the repository.
-2) Create a new branch: git checkout -b feature/YourFeatureName
-3) Make your changes and commit them: git commit -m 'Add some feature'
-4) Push to the branch: git push origin feature/YourFeatureName
 5) Create a pull request.
 
 ###Contact
