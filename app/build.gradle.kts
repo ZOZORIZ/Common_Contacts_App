@@ -106,6 +106,11 @@ dependencies {
     implementation (libs.picasso)
     implementation (libs.libphonenumber)
     implementation ("com.google.android.material:material:1.9.0")
+    implementation (libs.retrofit)
+    implementation (libs.converter.gson)
+    implementation ("com.squareup.okhttp3:okhttp:4.9.3")
+    implementation ("com.squareup.okhttp3:logging-interceptor:4.9.3")
+
 
 
 }

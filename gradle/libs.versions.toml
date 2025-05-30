@@ -10,6 +10,7 @@ compiler = "4.15.1"
 compilerVersion = "4.14.2'"
 compressor = "3.0.1"
 constraintlayout = "2.1.4"
+converterGson = "2.9.0"
 coreKtxVersion = "1.12.0"
 coreSplashscreen = "1.0.1"
 espressoCoreVersion = "3.5.1"
@@ -39,6 +40,7 @@ material = "1.12.0"
 material3 = "1.2.1"
 picasso = "2.71828"
 recyclerview = "1.3.2"
+retrofit = "2.9.0"
 room = "2.5.0"
 roomCompiler = "2.5.0"
 roomKtx = "2.6.1"
@@ -69,6 +71,7 @@ androidx-lifecycle-runtime-ktx-v262 = { module = "androidx.lifecycle:lifecycle-r
 androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerview" }
 compiler-v4142 = { module = "com.github.bumptech.glide:compiler", version.ref = "compilerVersion" }
 compressor = { module = "id.zelory:compressor", version.ref = "compressor" }
+converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-database-ktx = { module = "com.google.firebase:firebase-database-ktx" }
@@ -78,6 +81,7 @@ glide-v4142 = { module = "com.github.bumptech.glide:glide", version.ref = "glide
 img-compressor = { module = "com.github.f0ris:img-compressor", version.ref = "imgCompressor" }
 libphonenumber = { module = "com.googlecode.libphonenumber:libphonenumber", version.ref = "libphonenumber" }
 picasso = { module = "com.squareup.picasso:picasso", version.ref = "picasso" }
+retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
