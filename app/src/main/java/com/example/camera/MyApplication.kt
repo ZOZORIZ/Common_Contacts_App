@@ -5,7 +5,7 @@ import androidx.room.Room
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
-class MyApplication : Application() {
+public class MyApplication : Application() {
 
     // Initialize the database using by lazy
     val database: AppDatabase by lazy {

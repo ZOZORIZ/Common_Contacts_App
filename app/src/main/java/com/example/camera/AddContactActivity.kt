@@ -4,20 +4,19 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Button
-import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -36,8 +35,25 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import okhttp3.MediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import okhttp3.ResponseBody
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.Header
+import retrofit2.http.Multipart
+import retrofit2.http.POST
+import retrofit2.http.Part
 import java.io.File
+import java.net.SocketTimeoutException
 import java.util.UUID
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+
+
 
 class AddContactActivity : AppCompatActivity() {
 
@@ -45,7 +61,6 @@ class AddContactActivity : AppCompatActivity() {
     private var existingContact: Contact? = null
     private lateinit var binding: ActivityAddContactBinding
     private var imageUri: Uri? = null
-    private val firebaseManager = FirebaseManager()
     private val viewModel: ContactViewModel by viewModels {
         ContactViewModelFactory((application as MyApplication).contactRepository)
     }
@@ -55,8 +70,8 @@ class AddContactActivity : AppCompatActivity() {
         binding = ActivityAddContactBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        //return to previous activity
-        backButton = findViewById(R.id.back_button)
+        // return to previous activity
+        backButton = findViewById<ImageButton>(R.id.back_button)
         binding.backButton.setOnClickListener {
             onBackPressed()
         }
@@ -65,32 +80,26 @@ class AddContactActivity : AppCompatActivity() {
         if (existingContact != null) {
             // Update the header text to "Edit Contact"
             binding.header.text = "Edit Contact"
-
-            // Update the text below the image to "Click To Update Picture"
             binding.textBelowImage.text = "Click To Update Picture"
 
-            // Fetch and observe contact details using ViewModel
             existingContact?.let {
                 viewModel.getContactById(it.id).observe(this) { contact ->
-                    contact?.let {
-                        preFillContactDetails(it)
-                    }
+                    contact?.let { preFillContactDetails(it) }
                 }
             }
         } else {
-            // If it's a new contact, you can set the default header and image text if needed
             binding.header.text = "Add New Contact"
             binding.textBelowImage.text = "Click To Add Picture"
         }
 
-        // Set click listener to open the image source dialog
         binding.cardview.setOnClickListener {
             showImageSourceDialog()
         }
 
-        // Set click listener to save contact
         binding.saveContactButton.setOnClickListener {
-            saveContact()
+            imageUri?.let { uri ->
+                saveContact(uri)
+            } ?: Toast.makeText(this, "Please select an image", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -99,12 +108,11 @@ class AddContactActivity : AppCompatActivity() {
         val fullPhoneNumber = contact.phoneNumber ?: ""
         val phoneUtil = PhoneNumberUtil.getInstance()
         try {
-            val parsedNumber = phoneUtil.parse(fullPhoneNumber, "IN")  // Adjust default region as needed
+            val parsedNumber = phoneUtil.parse(fullPhoneNumber, "IN")
             binding.countryCodeInput.setText("+${parsedNumber.countryCode}")
             binding.phoneInput.setText(parsedNumber.nationalNumber.toString())
         } catch (e: NumberParseException) {
             e.printStackTrace()
-            // Handle parse error, possibly set default or empty values
             binding.countryCodeInput.setText("")
             binding.phoneInput.setText(fullPhoneNumber)
         }
@@ -113,7 +121,6 @@ class AddContactActivity : AppCompatActivity() {
         binding.labelInput.setText(contact.label)
         binding.emailInput.setText(contact.email)
         binding.birthdayInput.setText(contact.birthday)
-        // Load the contact image if available
         contact.imageUrl?.let {
             loadImage(Uri.parse(it), binding.contactImageView)
             binding.contactImageView.visibility = View.VISIBLE
@@ -121,81 +128,52 @@ class AddContactActivity : AppCompatActivity() {
         }
     }
 
-    private fun saveContact() {
+    private fun saveContact(imageUri: Uri) {
         val name = binding.nameInput.text.toString()
         val countryCode = binding.countryCodeInput.text.toString()
         val phone = binding.phoneInput.text.toString()
-        val fullPhoneNumber = "$countryCode $phone"  // Concatenate country code and phone number
+        val fullPhoneNumber = "$countryCode $phone"
         val phoneNumber2 = binding.phoneInput2.text.toString()
         val email = binding.emailInput.text.toString()
         val label = binding.labelInput.text.toString()
         val birthday = binding.birthdayInput.text.toString()
 
         if (name.isNotEmpty() && phone.isNotEmpty()) {
-            // Disable the button to prevent multiple clicks
             binding.saveContactButton.isEnabled = false
-
-            // Show the custom progress dialog
             val savingDialog = showSavingDialog()
 
             lifecycleScope.launch {
-                val imageUrl = withContext(Dispatchers.IO) {
-                    imageUri?.let { uri ->
-                        uploadImageToFirebase(uri)
-                    } ?: existingContact?.imageUrl.orEmpty()
+                val uploadedImageUrl = withContext(Dispatchers.IO) {
+                    uploadImageToFirebase(imageUri)
                 }
-
-                if (imageUrl.isNotEmpty()) {
-                    val firebaseId = existingContact?.firebaseId ?: UUID.randomUUID().toString()
-
+                if (uploadedImageUrl.isNotEmpty()) {
                     val contact = Contact(
-                        id = firebaseId,
+                        id = existingContact?.id ?: UUID.randomUUID().toString(),
                         name = name,
                         phoneNumber = fullPhoneNumber,
-                        imageUrl = imageUrl,
-                        firebaseId = firebaseId,
+                        imageUrl = uploadedImageUrl,
                         phoneNumber2 = phoneNumber2,
                         email = email,
                         label = label,
                         birthday = birthday
                     )
 
-                    // Save or update the contact in Firestore
-                    val db = FirebaseFirestore.getInstance()
-                    db.collection("contacts").document(firebaseId).set(contact)
-                        .addOnSuccessListener {
-                            // Insert into Room database after Firestore
-                            viewModel.insertContacts(listOf(contact))
-                            Toast.makeText(this@AddContactActivity, "Contact saved successfully", Toast.LENGTH_SHORT).show()
-                            savingDialog.dismiss()
-
-                            // Prepare result Intent and finish activity
-                            val resultIntent = Intent().apply {
-                                putExtra("contact", contact)
-                            }
-                            setResult(Activity.RESULT_OK, resultIntent)
-                            finish()
-                        }
-                        .addOnFailureListener { e ->
-                            Toast.makeText(this@AddContactActivity, "Error saving contact: ${e.message}", Toast.LENGTH_SHORT).show()
-                            savingDialog.dismiss()
-                        }
-                } else {
-                    Toast.makeText(this@AddContactActivity, "Failed to upload image. Try again.", Toast.LENGTH_SHORT).show()
+                    saveContactToFirestore(contact)
                     savingDialog.dismiss()
+                } else {
+                    Toast.makeText(this@AddContactActivity, "Failed to upload image", Toast.LENGTH_SHORT).show()
+                    savingDialog.dismiss()
+                    binding.saveContactButton.isEnabled = true
                 }
-
-                // Re-enable the button after the operation is complete
-                binding.saveContactButton.isEnabled = true
             }
         } else {
-            Toast.makeText(this@AddContactActivity, "Please fill all fields", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun showSavingDialog(): AlertDialog {
         val dialogView = layoutInflater.inflate(R.layout.loading_screen, null)
-        val builder = AlertDialog.Builder(this,R.style.TransparentDialog)
+        val builder = AlertDialog.Builder(this, R.style.TransparentDialog)
             .setView(dialogView)
             .setCancelable(false)
 
@@ -211,22 +189,36 @@ class AddContactActivity : AppCompatActivity() {
 
         return try {
             val uploadTask = imageRef.putFile(imageUri).await()
-            val downloadUrl = imageRef.downloadUrl.await()
-            downloadUrl.toString()
+            imageRef.downloadUrl.await().toString()
         } catch (e: Exception) {
             ""
         }
+    }
+
+    private fun saveContactToFirestore(contact: Contact) {
+        val db = FirebaseFirestore.getInstance()
+        db.collection("contacts").document(contact.id).set(contact)
+            .addOnSuccessListener {
+                viewModel.insertContacts(listOf(contact))
+                Toast.makeText(this@AddContactActivity, "Contact saved successfully", Toast.LENGTH_SHORT).show()
+                setResult(Activity.RESULT_OK, Intent().apply { putExtra("contact", contact) })
+                finish()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this@AddContactActivity, "Error saving contact: ${e.message}", Toast.LENGTH_SHORT).show()
+                binding.saveContactButton.isEnabled = true
+            }
     }
 
     private fun loadImage(imageUri: Uri?, imageView: ImageView) {
         if (imageUri != null) {
             Glide.with(this)
                 .load(imageUri)
-                .apply(RequestOptions()
-                    .override(dpToPx(50), dpToPx(50))
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)  // Cache the image for faster loading
-                    .skipMemoryCache(false)
-                    .transform(CircleCrop())
+                .apply(
+                    RequestOptions()
+                        .override(50,50)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .transform(CircleCrop())
                 )
                 .into(imageView)
         } else {
@@ -256,51 +248,128 @@ class AddContactActivity : AppCompatActivity() {
 
         alertDialog.show()
 
-        // Adjust the width of the dialog programmatically
-        val window = alertDialog.window
-        val params = window?.attributes
-        params?.width = (resources.displayMetrics.widthPixels * 0.9).toInt()
-        window?.attributes = params
-    }
-
-
-    private fun openGallery() {
-        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        startActivityForResult(intent, REQUEST_IMAGE_PICK)
+        alertDialog.window?.apply {
+            val params = attributes
+            params?.width = (resources.displayMetrics.widthPixels * 0.9).toInt()
+            attributes = params
+        }
     }
 
     private fun startCamera() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), CAMERA_REQUEST_CODE)
-        } else {
-            imageUri = createImageUri()
-            imageUri?.let { uri ->
-                val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
-                    putExtra(MediaStore.EXTRA_OUTPUT, uri)
-                }
-                startActivityForResult(intent, REQUEST_IMAGE_CAPTURE)
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        intent.resolveActivity(packageManager)?.let {
+            val imageFile = createImageFile()
+            imageFile?.let {
+                val imageUri = FileProvider.getUriForFile(
+                    this,
+                    "com.example.camera.fileprovider",
+                    it
+                )
+                this.imageUri = imageUri
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
+                startActivityForResult(intent, REQUEST_CODE_CAMERA)
             }
         }
     }
 
-    private fun createImageUri(): Uri {
-        val imageFile = File(externalCacheDir, "photo.jpg")
-        return FileProvider.getUriForFile(this, "${packageName}.fileprovider", imageFile)
+    private fun openGallery() {
+        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        startActivityForResult(intent, REQUEST_CODE_GALLERY)
+    }
+
+    private fun createImageFile(): File? {
+        return try {
+            val storageDir = getExternalFilesDir(null)
+            File.createTempFile(UUID.randomUUID().toString(), ".jpg", storageDir)
+        } catch (ex: Exception) {
+            Toast.makeText(this, "Error creating image file", Toast.LENGTH_SHORT).show()
+            null
+        }
+    }
+
+    private fun performCrop(imageUri: Uri) {
+        val destinationUri = Uri.fromFile(File(cacheDir, "croppedImage_${UUID.randomUUID()}.jpg"))
+        val options = UCrop.Options().apply {
+            setCompressionQuality(80)
+            setHideBottomControls(true)
+            setFreeStyleCropEnabled(true)
+            setCircleDimmedLayer(true)
+        }
+
+        UCrop.of(imageUri, destinationUri)
+            .withAspectRatio(1f, 1f)
+            .withOptions(options)
+            .start(this)
+    }
+
+    private fun handleCropResult(resultCode: Int, data: Intent?) {
+        if (resultCode == Activity.RESULT_OK && data != null) {
+            val resultUri = UCrop.getOutput(data)
+            resultUri?.let { uri ->
+                removeImageBackground(uri)
+            }
+        }
+    }
+
+    private fun removeImageBackground(imageUri: Uri) {
+        val apiKey = "3a3bsxDjRFBBvB6VX2HEX7mL"
+        val file = File(imageUri.path)
+
+        val retrofit = RetrofitClient.instance
+        val service = retrofit.create(RemoveBgService::class.java)
+
+        val requestFile = RequestBody.create("image/*".toMediaTypeOrNull(), file)
+        val body = MultipartBody.Part.createFormData("image_file", file.name, requestFile)
+
+        val call = service.removeBackground(apiKey, body)
+        call.enqueue(object : Callback<ResponseBody> {
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                if (response.isSuccessful) {
+                    response.body()?.let { responseBody ->
+                        lifecycleScope.launch {
+                            val croppedImageUri = withContext(Dispatchers.IO) {
+                                saveCroppedImage(responseBody.bytes())
+                            }
+                            croppedImageUri?.let {
+                                loadImage(it, binding.contactImageView)
+                                this@AddContactActivity.imageUri = it
+                                binding.contactImageView.visibility = View.VISIBLE
+                                binding.placeholderImageView.visibility = View.GONE
+                            } ?: run {
+                                Toast.makeText(this@AddContactActivity, "Failed to process image", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                } else {
+                    // Enhanced error logging
+                    val errorBody = response.errorBody()?.string()
+                    val errorCode = response.code()
+                    Toast.makeText(this@AddContactActivity, "Failed to remove background: $errorBody", Toast.LENGTH_SHORT).show()
+                    Log.e("RemoveBgService", "Failed to remove background. Error code: $errorCode, Error body: $errorBody")
+                }
+            }
+
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                // Enhanced failure logging
+                if (t is SocketTimeoutException) {
+                    Toast.makeText(this@AddContactActivity, "Request timed out. Please try again later.", Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(this@AddContactActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                }
+                Log.e("RemoveBgService", "API call failed", t)
+            }
+        })
     }
 
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            CAMERA_REQUEST_CODE -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    startCamera()
-                } else {
-                    Toast.makeText(this, "Camera permission is required", Toast.LENGTH_SHORT).show()
-                }
-            }
+
+    private fun saveCroppedImage(imageBytes: ByteArray): Uri? {
+        return try {
+            val file = File(externalCacheDir, "croppedImage_${UUID.randomUUID()}.jpg")
+            file.writeBytes(imageBytes)
+            Uri.fromFile(file)
+        } catch (e: Exception) {
+            null
         }
     }
 
@@ -309,63 +378,37 @@ class AddContactActivity : AppCompatActivity() {
 
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
-                REQUEST_IMAGE_CAPTURE -> {
-                    imageUri?.let { uri ->
-                        startCrop(uri)
+                REQUEST_CODE_GALLERY -> {
+                    data?.data?.let { imageUri ->
+                        performCrop(imageUri)
                     }
                 }
-                REQUEST_IMAGE_PICK -> {
-                    val selectedImageUri = data?.data
-                    selectedImageUri?.let { uri ->
-                        startCrop(uri)
+                REQUEST_CODE_CAMERA -> {
+                    imageUri?.let { uri ->
+                        performCrop(uri)
                     }
                 }
                 UCrop.REQUEST_CROP -> {
-                    val resultUri = UCrop.getOutput(data!!)
-                    resultUri?.let { uri ->
-                        imageUri = uri
-                        binding.contactImageView.setImageDrawable(null)
-                        loadImage(uri, binding.contactImageView)
-                        binding.contactImageView.visibility = View.VISIBLE
-                        binding.placeholderImageView.visibility = View.GONE
-                        imageUri = uri
-                    }
+                    handleCropResult(resultCode, data)
                 }
             }
         } else if (resultCode == UCrop.RESULT_ERROR) {
-            val cropError = UCrop.getError(data!!)
+            val cropError = data?.let { UCrop.getError(it) }
             Toast.makeText(this, "Crop error: ${cropError?.message}", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun startCrop(uri: Uri) {
-        val destinationUri = Uri.fromFile(createTempFile())
-
-        UCrop.of(uri, destinationUri)
-            .withOptions(UCrop.Options().apply {
-                setToolbarTitle("Crop Image")
-                setCompressionQuality(100)
-            })
-            .start(this)
+    interface RemoveBgService {
+        @Multipart
+        @POST("v1.0/removebg")
+        fun removeBackground(
+            @Header("X-Api-Key") apiKey: String,
+            @Part imageFile: MultipartBody.Part
+        ): Call<ResponseBody>
     }
-
-    private fun createTempFile(): File {
-        val file = File(externalCacheDir, "cropped_image_${System.currentTimeMillis()}.jpg")
-        file.createNewFile()
-        return file
-    }
-
-    private fun dpToPx(dp: Int): Int {
-        val density = resources.displayMetrics.density
-        return (dp * density).toInt()
-    }
-
-
-
 
     companion object {
-        const val CAMERA_REQUEST_CODE = 1001
-        const val REQUEST_IMAGE_CAPTURE = 1002
-        const val REQUEST_IMAGE_PICK = 1003
+        private const val REQUEST_CODE_GALLERY = 1
+        private const val REQUEST_CODE_CAMERA = 2
     }
 }
