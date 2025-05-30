@@ -1,2 +1,34 @@
+# Ignore Android build output folders
+/app/build/
+/build/
+
+# Ignore generated files
+/app/build/generated/
+/app/build/intermediates/
+/app/build/outputs/
+
+
+
+# Ignore local config files
+/local.properties
+
+# Ignore Gradle cache and wrapper files
+/.gradle/
+/gradle-wrapper.jar
+/gradle-wrapper.properties
+
+# Ignore IDE files
+.idea/
+/*.iml
 *.iml
+*.ipr
+*.iws
+
+# Ignore logs and OS files
+*.log
+*.swp
 .DS_Store
+Thumbs.db
+
+# Ignore Firebase config file containing sensitive keys
+/app/google-services.json
